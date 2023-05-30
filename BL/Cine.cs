@@ -11,7 +11,7 @@ namespace BL
             try
             {
                 using DL.EcoronaCineProjectContext context = new();
-                int queryEF = context.Database.ExecuteSqlRaw($"CineAdd '{cine.Nombre}', '{cine.Direccion}', {cine.IdZona}, {cine.Venta}");
+                int queryEF = context.Database.ExecuteSqlRaw($"CineAdd '{cine.Nombre}', '{cine.Direccion}', {cine.Zona.IdZona}, {cine.Venta}");
                 if (queryEF > 0)
                 {
                     result.Correct = true;
@@ -31,7 +31,7 @@ namespace BL
             try
             {
                 using DL.EcoronaCineProjectContext context = new();
-                int queryEF = context.Database.ExecuteSqlRaw($"CineUpdate {cine.IdCine},'{cine.Nombre}', '{cine.Direccion}', {cine.IdZona}, {cine.Venta}");
+                int queryEF = context.Database.ExecuteSqlRaw($"CineUpdate {cine.IdCine},'{cine.Nombre}', '{cine.Direccion}', {cine.Zona.IdZona}, {cine.Venta}");
                 if (queryEF > 0)
                 {
                     result.Correct = true;
