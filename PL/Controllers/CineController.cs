@@ -4,6 +4,7 @@ namespace PL.Controllers
 {
     public class CineController : Controller
     {
+        [HttpGet]
         public ActionResult GetAll()
         {
             ML.Result result = BL.Cine.GetAll();
@@ -14,8 +15,24 @@ namespace PL.Controllers
             return View(cine);
 
         }
+        public ActionResult Delete(int IdCine)
+        {
+            ML.Result result = BL.Cine.Delete(IdCine);
+            if (result.Correct)
+            {
+                ViewBag.Message = "Se elimino el Cine";
+
+            }
+            else
+            {
+                ViewBag.Message = "Ocurrio un error al eliminar el Cine";
+            }
+            return PartialView("Modal");
+
+        }
+
         [HttpGet]
-        public ActionResult Form(int? IdCine)
+        public ActionResult FormMapa(int? IdCine)
         {
             ML.Cine cine = new ML.Cine();
             cine.Zona = new ML.Zona();
@@ -37,7 +54,7 @@ namespace PL.Controllers
 
         }
         [HttpPost]
-        public ActionResult Form(ML.Cine cine)
+        public ActionResult FormMapa(ML.Cine cine)
         {
             ML.Result result = new ML.Result();
             if (cine.IdCine == 0)
@@ -66,20 +83,27 @@ namespace PL.Controllers
             }
             return PartialView("Modal");
         }
-        public ActionResult Delete(int IdCine)
-        {
-            ML.Result result = BL.Cine.Delete(IdCine);
-            if (result.Correct)
-            {
-                ViewBag.Message = "Se elimino el Cine";
 
-            }
-            else
-            {
-                ViewBag.Message = "Ocurrio un error al eliminar el Cine";
-            }
-            return PartialView("Modal");
+        [HttpGet]
+        public ActionResult Estadistica()
+        {
+            ML.Cine cine = new ML.Cine();
+            cine.Ventas = new ML.Venta();
+            //ML.Result resultCines = BL.Cine.GetAll();
+            ML.Result resultVentas = BL.Cine.GetAllVentas();
+            
+
+            //cine.Cines = resultCines.Objects;
+            cine = (ML.Cine)resultVentas.Object;
+
+
+            return View(cine);
 
         }
+
+
+
+
+
     }
 }

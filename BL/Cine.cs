@@ -132,5 +132,61 @@ namespace BL
             }
             return result;
         }
+
+        public static ML.Result GetAllVentas()
+        {
+            ML.Result result = new();
+            ML.Cine cine = new ML.Cine();
+            cine.Zona = new ML.Zona();
+            cine.Ventas = new ML.Venta();
+            try
+            {
+                using DL.EcoronaCineProjectContext context = new();
+                var cineList = context.Cines.FromSqlRaw("CineGetAll").ToList();
+
+                result.Objects = new List<object>();
+                foreach (var row in cineList)
+                {
+                    {
+                        cine.IdCine = row.IdCine;
+                        cine.Venta = row.Venta;
+                        cine.Zona.IdZona = row.IdZona;
+
+                        if (cine.Zona.IdZona == 1){
+                            cine.Ventas.SumaNorte= cine.Ventas.SumaNorte + cine.Venta;
+                            cine.Ventas.Sumatotal = cine.Ventas.Sumatotal + cine.Venta;
+                        }
+                        if (cine.Zona.IdZona == 2)
+                        {
+                            cine.Ventas.SumaSur = cine.Ventas.SumaSur + cine.Venta;
+                            cine.Ventas.Sumatotal = cine.Ventas.Sumatotal + cine.Venta;
+                        }
+                        if (cine.Zona.IdZona == 3)
+                        {
+                            cine.Ventas.SumaEste = cine.Ventas.SumaEste + cine.Venta;
+                            cine.Ventas.Sumatotal = cine.Ventas.Sumatotal + cine.Venta;
+                        }
+                        if (cine.Zona.IdZona == 4)
+                        {
+                            cine.Ventas.SumaOeste = cine.Ventas.SumaOeste + cine.Venta;
+                            cine.Ventas.Sumatotal = cine.Ventas.Sumatotal + cine.Venta;
+                        }
+                        result.Object=cine;
+                    }
+                }
+                cine.Ventas.PromNorte = (cine.Ventas.SumaNorte / cine.Ventas.Sumatotal) * 100;
+                cine.Ventas.PromSur = (cine.Ventas.SumaSur / cine.Ventas.Sumatotal) * 100;
+                cine.Ventas.PromEste = (cine.Ventas.SumaEste / cine.Ventas.Sumatotal) * 100;
+                cine.Ventas.PromOeste = (cine.Ventas.SumaOeste / cine.Ventas.Sumatotal) * 100;
+                result.Correct = true;
+            }
+            catch (Exception ex)
+            {
+                result.Correct = false;
+                result.Ex = ex;
+                result.ErrorMessage = ex.Message;
+            }
+            return result;
+        }
     }
 }

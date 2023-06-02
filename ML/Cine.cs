@@ -14,6 +14,7 @@ namespace ML
         public int IdZona { get; set; } = default!;
         public int Venta { get; set; } = default!;
         public ML.Zona Zona { get; set; } = default!;
+        public ML.Venta Ventas { get; set; } = default!;
         public List<object> Cines { get; set; } = default!;
     }
 }
