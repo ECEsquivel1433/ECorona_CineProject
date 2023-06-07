@@ -89,12 +89,15 @@ namespace PL.Controllers
         {
             ML.Cine cine = new ML.Cine();
             cine.Ventas = new ML.Venta();
-            //ML.Result resultCines = BL.Cine.GetAll();
+            ML.Result resultCines = BL.Cine.GetAll();
             ML.Result resultVentas = BL.Cine.GetAllVentas();
             
 
-            //cine.Cines = resultCines.Objects;
+            cine.Cines = resultCines.Objects;
             cine = (ML.Cine)resultVentas.Object;
+
+            
+            cine.Cines = resultCines.Objects;
 
 
             return View(cine);
