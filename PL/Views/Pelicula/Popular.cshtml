@@ -1,0 +1,93 @@
+﻿@model ML.Pelicula
+@{
+    ViewBag.Title = "Popular";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container">
+    <section>
+        <h2>Cuevana</h2>
+        <p>
+            En este modulo puedes visualizar las peliculas mas populares del momento<br />
+        </p>
+    </section>
+    <hr />
+    <style>
+        body {
+            background-color: white
+        }
+    </style>
+    <section>
+
+        <div class="row">
+            @foreach (ML.Pelicula pelicula in Model.results)
+            {
+
+                <div class="col-3">
+                    <div class="card bg-light shadow p-3 mb-5 rounded" style="width: 19rem;">
+                        <img class=" card-img-top">
+                        <img src=@pelicula.poster_path>
+                        <div class="card-body ">
+                            <h5 class="card-title card-header text-center bg-transparent" id="Nombre">@pelicula.original_title</h5>
+                            <p class="card-text"> Descripción: </p>
+                            <p class="card-text"> @pelicula.overview </p>
+                            <a class="btn btn-danger glyphicon" onclick="AddFavorito(@pelicula.id)">Agregar a favoritos</a>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </section>
+</div>
+
+<script type="text/javascript">
+    function AddFavorito(idPelicula) {
+        $.ajax({
+            method: "POST",
+            dataType: 'application/json',
+            url: 'https://api.themoviedb.org/3/account/19728978/favorite?api_key=99e2becbdc4d8cdf4d51c55832a65f43&session_id=744e4a56d0759f21a4900776e186ee42dbc0e073',
+            data: {
+                "media_type": "movie",
+                "media_id": idPelicula,
+                "favorite": true
+            },
+            success: {},
+            error: function (ex) {
+                alert('Agregado');
+            }
+        });
+    }
+</script>
+
+<script type="text/javascript">
+    function GetUser() {
+        $.ajax({
+            url: 'https://randomuser.me/api/',
+            method: "GET",
+            dataType: 'json',
+            success: function (results) {
+
+                var tableString = '<tr>' +
+                    '<td>' + results.results[0].name.first + '</td>' +
+                    '<td>' + results.results[0].email + '</td>' +
+                    '<td>' + results.results[0].location.street.name + '</td>' +
+                    '<td>' + results.results[0].gender + '</td>' +
+                    '<td>' + '<img src ="' + results.results[0].picture.large + '"/>' + '</td> ' +
+                    '</tr>';
+                $('#Table tbody').append(tableString);
+            },
+            error: function (ex) {
+                alert('Failed.' + ex);
+            }
+        });
+    }
+</script>
+
+
+<script type="text/javascript">
+
+    function Limpiar() {
+        $('#Table tbody').empty();
+    }
+
+</script>

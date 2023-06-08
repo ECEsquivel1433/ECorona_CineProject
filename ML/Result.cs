@@ -13,5 +13,6 @@ namespace ML
         public Exception Ex { get; set; } = default!;
         public object Object { get; set; } = default!;
         public List<object> Objects { get; set; } = default!;
+        public List<object> results { get; set; } = default!;
     }
 }
