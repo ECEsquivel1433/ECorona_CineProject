@@ -1,107 +1,99 @@
 ﻿@model ML.Cine
 
-@{
-    ViewBag.Title = "Estadistica";
-    Layout = "~/Views/Shared/_Layout.cshtml";
-}
-
-
-<div class="container">
-
-    <div class="row">
-        <div class="col-md-12">
-            @*<h2>Estadistica</h2>*@
-        </div>
-    </div>
-
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Canvas test</title>
+</head>
+<body>
     <style>
         #map {
-            height: 400px;
-            width: 50%;
-            float: left;
-        }
-
-        #chartContainer {
-            height: 400px;
+            height: 350px;
             width: 50%;
         }
     </style>
+    <div class="row">
+        <div class="col-md-6">
+            <div id="chartContainer""></div>
+        </div>
+        <div class="col-md-6">
+            <h1 class="text-center" style="text-shadow: 0 0 4px #4800ff;"> Puntos de venta</h1>
+            <div id="map" style="@*position: absolute;*@ width: 500px; height: 350px; border: 3px solid green; left: 100px;"></div>
+        </div>
+    </div>
 
-
-
-    <h1>Cines y mapa</h1>
-    <div id="map"></div>
-    <div id="chartContainer"></div>
-
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-    <script src="https://canvasjs.com/assets/script/jquery.canvasjs.min.js"></script>
-    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCSKBDdPPlfca_zTwyxKiicRQn1qfgRjLw&callback=initMap" async defer></script>
     <script src="https://canvasjs.com/assets/script/canvasjs.min.js"></script>
     <script src="https://polyfill.io/v3/polyfill.min.js?features=default"></script>
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCSKBDdPPlfca_zTwyxKiicRQn1qfgRjLw&callback=initMap&libraries=&v=weekly&sensor=false" defer></script>
     <script type="text/javascript">
 
-    
+        window.onload = function () {
+            var chart = new CanvasJS.Chart("chartContainer", {
+                animationEnabled: true,
+                title: {
+                    text: "Porcentaje de ventas por zona"
+                },
+                data: [{
+                    type: "pie",
+                    startAngle: 225,
+                    yValueFormatString: "##0.00\"%\"",
+                    indexLabel: "{label} {y}",
+                    dataPoints: [
+                        { label: "Norte", y: @Model.Ventas.PromNorte },
+                        { label: "Este", y: @Model.Ventas.PromEste },
+                        { label: "Sur", y: @Model.Ventas.PromSur },
+                        { label: "Oeste", y: @Model.Ventas.PromOeste }
+                    ]
+                }]
+            });
+            chart.render();
+        }
         function initMap() {
-            // Crea un mapa centrado en la Ciudad de México
-            var map = new google.maps.Map(document.getElementById('map'), {
-                center: { lat: 19.4326, lng: -99.1332 },
-                zoom: 12
-            });
 
-            // Crea los marcadores de los cines
-            var cineMexMarker = new google.maps.Marker({
-                position: { lat: 19.419457, lng: -99.162314 },
-                map: map,
-                title: 'CineMex'
-            });
+            if ($("#txtLatitud").val() == 0 && $("#txtLongitud").val() == 0) {
 
-            var cinePolisMarker = new google.maps.Marker({
-                position: { lat: 19.421445, lng: -99.166890 },
-                map: map,
-                title: 'CinePolis'
-            });
+                myLatlng = { lat: 19.6161, lng: -99.2900 };
+            } else {
 
-            // Crea las ventanas de información de los marcadores
-            var cineMexInfoWindow = new google.maps.InfoWindow({
-                content: 'Nombre: CineMex<br>Dirección: Av Chapultepec 340, Roma Nte., Cuauhtémoc, 06700 Ciudad de México, CDMX, México<br>Zona: Sur<br>Ventas: 5000'
-            });
+                myLatlng = { lat: 19.6161, lng: -99.2900 };
+            }
 
-            var cinePolisInfoWindow = new google.maps.InfoWindow({
-                content: 'Nombre: CinePolis<br>Dirección: Av. Chapultepec - Praga, Juárez, 06600 Ciudad de México, CDMX, México<br>Zona: Norte<br>Ventas: 3000'
+            const map = new google.maps.Map(document.getElementById("map"), {
+                zoom: 11,
+                center: myLatlng,
             });
+              @foreach (ML.Cine cine in Model.Cines)
+              {
+                                 <text>
+            var contentString = '<div id="content">' +
+                '<div id="siteNotice">' +
+                '</div>' +
+                'Descripción: ' + '@cine.Direccion' +
+                '<div id="bodyContent">' +
+                'Ventas:' + '@cine.Venta' + "<br>" +
+                'Zona:' + '@cine.Zona.Nombre' + "<br>" +
+                'IdCine:' + '@cine.IdCine' + "<br>" +
+                '</div>' +
+                '</div>';
 
-            // Asocia las ventanas de información a los marcadores
-            cineMexMarker.addListener('click', function () {
-                cineMexInfoWindow.open(map, cineMexMarker);
-            });
+            var marker_@cine.IdCine = new google.maps.Marker({ position: { lat:@cine.Latitud, lng: @cine.Longitud }, map: map });
 
-            cinePolisMarker.addListener('click', function () {
-                cinePolisInfoWindow.open(map, cinePolisMarker);
+            (marker_@cine.IdCine).addListener("click", function () {
+                (infoWindow_@cine.IdCine).open(map, marker_@cine.IdCine);
             });
-            $(function () {
-                var chart = new CanvasJS.Chart("chartContainer", {
-                    animationEnabled: true,
-                    title: {
-                        text: "Porcentaje de ventas por zona"
-                    },
-                    data: [{
-                        type: "pie",
-                        startAngle: 225,
-                        yValueFormatString: "##0.00\"%\"",
-                        indexLabel: "{label} {y}",
-                        dataPoints: [
-                            { label: "Norte", y: @Model.Ventas.PromNorte },
-                            { label: "Este", y: @Model.Ventas.PromEste },
-                            { label: "Sur", y: @Model.Ventas.PromSur },
-                            { label: "Oeste", y: @Model.Ventas.PromOeste }
-                        ]
-                    }]
-                });
-                chart.render();
+            var infoWindow_@cine.IdCine = new google.maps.InfoWindow({
+                content: contentString,
+                ariaLabel: "Punto de Venta",
             });
+            </text>
+              }
+
+            //map.addListener("click", (mapsMouseEvent) => {
 
         }
+        window.initMap = initMap;
 
     </script>
-</div>
+
+</body>
+</html>

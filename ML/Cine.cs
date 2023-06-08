@@ -13,6 +13,8 @@ namespace ML
         public string Direccion { get; set; } = default!;
         public int IdZona { get; set; } = default!;
         public int Venta { get; set; } = default!;
+        public string Latitud { get; set; } = default!;
+        public string Longitud { get; set; } = default!;
         public ML.Zona Zona { get; set; } = default!;
         public ML.Venta Ventas { get; set; } = default!;
         public List<object> Cines { get; set; } = default!;

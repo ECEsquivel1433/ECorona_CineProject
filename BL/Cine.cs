@@ -11,7 +11,7 @@ namespace BL
             try
             {
                 using DL.EcoronaCineProjectContext context = new();
-                int queryEF = context.Database.ExecuteSqlRaw($"CineAdd '{cine.Nombre}', '{cine.Direccion}', {cine.Zona.IdZona}, {cine.Venta}");
+                int queryEF = context.Database.ExecuteSqlRaw($"CineAdd '{cine.Nombre}', '{cine.Direccion}', {cine.Zona.IdZona}, {cine.Venta}, '{cine.Latitud}', '{cine.Longitud}'");
                 if (queryEF > 0)
                 {
                     result.Correct = true;
@@ -31,7 +31,7 @@ namespace BL
             try
             {
                 using DL.EcoronaCineProjectContext context = new();
-                int queryEF = context.Database.ExecuteSqlRaw($"CineUpdate {cine.IdCine},'{cine.Nombre}', '{cine.Direccion}', {cine.Zona.IdZona}, {cine.Venta}");
+                int queryEF = context.Database.ExecuteSqlRaw($"CineUpdate {cine.IdCine},'{cine.Nombre}', '{cine.Direccion}', {cine.Zona.IdZona}, {cine.Venta}, '{cine.Latitud}', '{cine.Longitud}'");
                 if (queryEF > 0)
                 {
                     result.Correct = true;
@@ -86,6 +86,8 @@ namespace BL
                         cine.Venta = row.Venta;
                         cine.Zona.IdZona = row.IdZona;
                         cine.Zona.Nombre = row.Zona;
+                        cine.Latitud= row.Latitud;
+                        cine.Longitud = row.Longitud;
 
 
                         result.Objects.Add(cine);
@@ -119,6 +121,8 @@ namespace BL
                     cine.Venta = row.Venta;
                     cine.Zona.IdZona = row.IdZona;
                     cine.Zona.Nombre = row.Zona;
+                    cine.Latitud = row.Latitud;
+                    cine.Longitud = row.Longitud;
 
                     result.Object = cine;
                 }
