@@ -1,43 +1,44 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using System.Net.Mail;
+using System.Security.Cryptography;
+using System.IO;
 
 namespace PL.Controllers
 {
     public class LoginController : Controller
     {
-        private IConfiguration configuration;
-        public LoginController(IConfiguration _configuration)
-        {
-            configuration = _configuration;
-        }
-        [HttpGet]
         public ActionResult Login()
         {
+            ML.Usuario usuario = new ML.Usuario();
+            return View(usuario);
+        }
+        [HttpPost]
+        public ActionResult Login(ML.Usuario usuario, string password)
+        {
+            // Crear una instancia del algoritmo de hash bcrypt
+            var bcrypt = new Rfc2898DeriveBytes(password, new byte[0], 10000, HashAlgorithmName.SHA256);
+            // Obtener el hash resultante para la contraseña ingresada 
+            var passwordHash = bcrypt.GetBytes(20);
+
+            if (usuario.UserName != null)
+            {
+                // Insertar usuario en la base de datos
+                usuario.Password = passwordHash;
+                ML.Result result = BL.Usuario.Add(usuario);
+                return View();
+            }
+            else
+            {
+                // Proceso de login
+                ML.Result result = BL.Usuario.GetByEmail(usuario.Email);
+                usuario = (ML.Usuario)result.Object;
+
+                if (usuario.Password.SequenceEqual(passwordHash))
+                {
+                    return RedirectToAction("Popular", "Pelicula");
+                }
+            }
             return View();
-		}
-
-		[HttpPost]
-		public ActionResult Login( byte[] pass, string UserName, string Email, int tab)
-		{
-			ML.Result result = BL.Usuario.GetByUserName(UserName);
-			if (result.Correct)
-			{
-				ML.Usuario usuario = (ML.Usuario)result.Object;
-				if (pass == usuario.Password)
-				{
-
-					return RedirectToAction("Pupular", "Pelicula");
-				}
-				else
-				{
-					ViewBag.Mensaje = "Contraseña invalida";
-					return PartialView("ModalLogin");
-				}
-			}
-			else
-			{
-				ViewBag.Mensaje = "Usuario invalido";
-			}
-			return PartialView("ModalLogin");
-		}
-	}
+        }
+    }
 }

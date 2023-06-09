@@ -1,6 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
+using System.Data;
+using Microsoft.Data.SqlClient;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -9,17 +11,18 @@ namespace BL
 {
 	public class Usuario
 	{
-		public static ML.Result GetByUserName(string UserName)
+		public static ML.Result GetByEmail(string Email)
 		{
 			ML.Result result = new ML.Result();
+			
 			try
 			{
 				using (DL.EcoronaCineProjectContext context = new DL.EcoronaCineProjectContext())
 				{
-					var queryEF = context.Usuarios.FromSqlRaw($"UsuarioGetByUserName {UserName}").AsEnumerable().FirstOrDefault();
+					var queryEF = context.Usuarios.FromSqlRaw($"UsuarioGetByEmail '{Email}'").AsEnumerable().FirstOrDefault();
 					if (queryEF != null)
 					{
-						ML.Usuario usuario = new ML.Usuario();
+						 ML.Usuario usuario = new ML.Usuario();
 
 						usuario.IdUsuario = queryEF.IdUsuario;
 						usuario.UserName = queryEF.Username;
@@ -43,5 +46,33 @@ namespace BL
 			}
 			return result;
 		}
-	}
+        public static ML.Result Add(ML.Usuario usuario)
+        {
+            ML.Result result = new ML.Result();
+            try
+            {
+                using (DL.EcoronaCineProjectContext context = new DL.EcoronaCineProjectContext())
+                {
+                    var query = context.Database.ExecuteSqlRaw($"UsuarioAdd '{usuario.Nombre}', '{usuario.ApellidoPaterno}', '{usuario.ApellidoMaterno}', '{usuario.UserName}', '{usuario.Email}', @Password", new SqlParameter("@Password", usuario.Password));
+
+                    if (query >= 1)
+                    {
+                        result.Correct = true;
+                    }
+                    else
+                    {
+                        result.Correct = false;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                result.Correct = false;
+                result.ErrorMessage = ex.Message;
+                result.Ex = ex;
+            }
+
+            return result;
+        }
+    }
 }
