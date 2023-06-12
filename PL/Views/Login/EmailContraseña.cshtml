@@ -1,0 +1,33 @@
+﻿@model ML.Usuario
+@{
+    Layout = null;
+}
+<link rel="stylesheet" href="/css/Login.css">
+<body>
+    <div class="login-wrap">
+        <div class="login-html">
+
+            <input id="tab-1" type="radio" name="tab" class="sign-in" checked><label for="tab-1" class="tab"></label>
+            <input id="tab-2" type="radio" name="tab" class="sign-up"><label for="tab-2" class="tab"></label>
+
+            <div class="login-form">
+                <div class="sign-in-htm">
+                    @using (Html.BeginForm("EmailContraseña", "Login", FormMethod.Post, new { enctype = "multipart/form-data" }))
+                    {
+
+                        <div class="group">
+                            <label for="Email" class="label">Ingrese el correo registrado</label>
+                            <input type="email" class="input" name="Email" required="">
+                        </div>
+                        <div class="group">
+                            <input type="submit" class="button" value="Enviar Mail" />
+                        </div>
+                    }
+                </div>
+                
+            </div>
+        </div>
+    </div>
+</body>
+
+

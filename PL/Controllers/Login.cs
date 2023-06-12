@@ -40,5 +40,51 @@ namespace PL.Controllers
             }
             return View();
         }
+
+
+        [HttpGet]
+        public ActionResult EmailContraseña()
+        {
+            return View();
+        }
+        [HttpPost]
+        public ActionResult EmailContraseña(string email)
+        {
+
+            //validar que exista el email en la bd
+
+            string emailOrigen = "edgarcoronaesq@gmail.com";
+
+            MailMessage mailMessage = new MailMessage(emailOrigen, email, "Recuperar Contraseña", "<p>Correo para recuperar contraseña</p>");
+            mailMessage.IsBodyHtml = true;
+            string contenidoHTML = System.IO.File.ReadAllText(@"C:\Users\digis\Documents\Repositorios\ECorona_CineProject\PL\Views\Shared\Email.html");
+            mailMessage.Body = contenidoHTML;
+            SmtpClient smtpClient = new SmtpClient("smtp.gmail.com");
+            smtpClient.EnableSsl = true;
+            smtpClient.UseDefaultCredentials = false;
+            smtpClient.Port = 587;
+            smtpClient.Credentials = new System.Net.NetworkCredential(emailOrigen, "toqpvjyuffviusej");
+
+            smtpClient.Send(mailMessage);
+            smtpClient.Dispose();
+
+            ViewBag.Modal = "show";
+            ViewBag.Mensaje = "Se ha enviado un correo de confirmación a tu correo electronico";
+            return View();
+        }
+
+
+
+        [HttpGet]
+        public ActionResult NuevaContrasena()
+        {
+            return View();
+        }
+        [HttpPost]
+        public ActionResult NuevaContrasena(string password)
+        {
+            return View();
+        }
+
     }
 }
