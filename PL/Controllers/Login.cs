@@ -7,6 +7,13 @@ namespace PL.Controllers
 {
     public class LoginController : Controller
     {
+        private IConfiguration configuration;
+        public LoginController(IConfiguration _configuration)
+        {
+            configuration = _configuration;
+
+        }
+
         public ActionResult Login()
         {
             ML.Usuario usuario = new ML.Usuario();
@@ -20,25 +27,35 @@ namespace PL.Controllers
             // Obtener el hash resultante para la contraseña ingresada 
             var passwordHash = bcrypt.GetBytes(20);
 
-            if (usuario.UserName != null)
+            if (usuario.UserName != null) // validar con un campo de la vista si se va a insertar o loguear 
             {
-                // Insertar usuario en la base de datos
-                usuario.Password = passwordHash;
+                //registrar
+                usuario.Password = passwordHash; //asignar contraseña encriptada y agregar usuario
                 ML.Result result = BL.Usuario.Add(usuario);
                 return View();
             }
             else
             {
-                // Proceso de login
-                ML.Result result = BL.Usuario.GetByEmail(usuario.Email);
-                usuario = (ML.Usuario)result.Object;
+                ML.Email email1 = new ML.Email();
+                email1.EmailDirection = usuario.Email;//pasar el correo de un tipo de objeto a otro ya que mi metodo funciona con ML.Email
+                //login
+                ML.Result result = BL.Usuario.GetByEmail(email1);
+                usuario = (ML.Usuario)result.Object;//obtener resultado del GetByEmail y pasarlo a tipo ML.usuario
 
-                if (usuario.Password.SequenceEqual(passwordHash))
+                if (result.Correct == true)
                 {
-                    return RedirectToAction("Popular", "Pelicula");
+                    if (usuario.Password.SequenceEqual(passwordHash)) //comparar contraseña del GetByEmail y mandar a la vista si es correcto
+                    {
+                        return RedirectToAction("Popular", "Pelicula");
+                    }
+
+                }
+                else
+                {
+                    ViewBag.Mensaje = "Correo o contraseña incorrectos";
                 }
             }
-            return View();
+            return View("Modal");
         }
 
 
@@ -48,42 +65,54 @@ namespace PL.Controllers
             return View();
         }
         [HttpPost]
-        public ActionResult EmailContraseña(string email)
+        public ActionResult EmailContraseña(string email, string token)
         {
+            ML.Email email1 = new ML.Email();
+            email1.EmailDirection = email;
+            email1.EmailOrigen = configuration["emailOrigen"];
+            email1.EmailRoute = configuration["emailRoute"];
+            email1.EmailPassword = configuration["emailPassword"];
+            email1.UrlDomain = configuration["urlDomain"];
 
-            //validar que exista el email en la bd
+            ML.Result result = BL.Usuario.GetByEmail(email1);
 
-            string emailOrigen = "edgarcoronaesq@gmail.com";
+            if (result.Correct == true)
+            {
+                ML.Result resultEmail = BL.Email.SendEmail(email1);
 
-            MailMessage mailMessage = new MailMessage(emailOrigen, email, "Recuperar Contraseña", "<p>Correo para recuperar contraseña</p>");
-            mailMessage.IsBodyHtml = true;
-            string contenidoHTML = System.IO.File.ReadAllText(@"C:\Users\digis\Documents\Repositorios\ECorona_CineProject\PL\Views\Shared\Email.html");
-            mailMessage.Body = contenidoHTML;
-            SmtpClient smtpClient = new SmtpClient("smtp.gmail.com");
-            smtpClient.EnableSsl = true;
-            smtpClient.UseDefaultCredentials = false;
-            smtpClient.Port = 587;
-            smtpClient.Credentials = new System.Net.NetworkCredential(emailOrigen, "toqpvjyuffviusej");
-
-            smtpClient.Send(mailMessage);
-            smtpClient.Dispose();
-
-            ViewBag.Modal = "show";
-            ViewBag.Mensaje = "Se ha enviado un correo de confirmación a tu correo electronico";
-            return View();
+                ViewBag.Modal = "show";
+                ViewBag.Mensaje = "Se ha enviado un correo de confirmación a tu correo electronico";
+                return View("Modal");
+            }
+            else
+            {
+                ViewBag.Modal = "show";
+                ViewBag.Mensaje = "El correo ingresado no esta registrado";
+                return View("Modal");
+            }
         }
-
-
 
         [HttpGet]
-        public ActionResult NuevaContrasena()
+        public ActionResult CambiarContrasena(string email)
         {
-            return View();
+            ML.Usuario usuario = new ML.Usuario();
+            usuario.Email = email;
+            return View(usuario);
         }
         [HttpPost]
-        public ActionResult NuevaContrasena(string password)
+        public ActionResult CambiarContrasena(string email,string password)
         {
-            return View();
+            var bcrypt = new Rfc2898DeriveBytes(password, new byte[0], 10000, HashAlgorithmName.SHA256);
+            // Obtener el hash resultante para la contraseña ingresada 
+            var passwordHash = bcrypt.GetBytes(20);
+
+            ML.Usuario usuario = new ML.Usuario();
+            usuario.Password = passwordHash; //asignar contraseña encriptada y agregar usuario
+            usuario.Email = email;
+            ML.Result result = BL.Usuario.UpdatePassword(usuario);
+            ViewBag.Mensaje = "Se actualizo la contraseña";
+            return View("Modal");
+
         }
 
     }

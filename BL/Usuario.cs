@@ -11,7 +11,7 @@ namespace BL
 {
 	public class Usuario
 	{
-		public static ML.Result GetByEmail(string Email)
+		public static ML.Result GetByEmail(ML.Email email1)
 		{
 			ML.Result result = new ML.Result();
 			
@@ -19,7 +19,7 @@ namespace BL
 			{
 				using (DL.EcoronaCineProjectContext context = new DL.EcoronaCineProjectContext())
 				{
-					var queryEF = context.Usuarios.FromSqlRaw($"UsuarioGetByEmail '{Email}'").AsEnumerable().FirstOrDefault();
+					var queryEF = context.Usuarios.FromSqlRaw($"UsuarioGetByEmail '{email1.EmailDirection}'").AsEnumerable().FirstOrDefault();
 					if (queryEF != null)
 					{
 						 ML.Usuario usuario = new ML.Usuario();
@@ -54,6 +54,34 @@ namespace BL
                 using (DL.EcoronaCineProjectContext context = new DL.EcoronaCineProjectContext())
                 {
                     var query = context.Database.ExecuteSqlRaw($"UsuarioAdd '{usuario.Nombre}', '{usuario.ApellidoPaterno}', '{usuario.ApellidoMaterno}', '{usuario.UserName}', '{usuario.Email}', @Password", new SqlParameter("@Password", usuario.Password));
+
+                    if (query >= 1)
+                    {
+                        result.Correct = true;
+                    }
+                    else
+                    {
+                        result.Correct = false;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                result.Correct = false;
+                result.ErrorMessage = ex.Message;
+                result.Ex = ex;
+            }
+
+            return result;
+        }
+        public static ML.Result UpdatePassword(ML.Usuario usuario)
+        {
+            ML.Result result = new ML.Result();
+            try
+            {
+                using (DL.EcoronaCineProjectContext context = new DL.EcoronaCineProjectContext())
+                {
+                    var query = context.Database.ExecuteSqlRaw($"UsuarioUpdatePassword '{usuario.Email}', @Password", new SqlParameter("@Password", usuario.Password));
 
                     if (query >= 1)
                     {
