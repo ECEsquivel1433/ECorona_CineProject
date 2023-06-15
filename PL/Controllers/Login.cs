@@ -112,8 +112,6 @@ namespace PL.Controllers
             ML.Result result = BL.Usuario.UpdatePassword(usuario);
             ViewBag.Mensaje = "Se actualizo la contraseña";
             return View("Modal");
-
         }
-
     }
 }
