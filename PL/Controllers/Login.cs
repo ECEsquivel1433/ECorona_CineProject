@@ -52,7 +52,7 @@ namespace PL.Controllers
                 }
                 else
                 {
-                    ViewBag.Mensaje = "Correo o contraseña incorrectos";
+                    ViewBag.Message = "Correo o contraseña incorrectos";
                 }
             }
             return View("Modal");
@@ -81,13 +81,13 @@ namespace PL.Controllers
                 ML.Result resultEmail = BL.Email.SendEmail(email1);
 
                 ViewBag.Modal = "show";
-                ViewBag.Mensaje = "Se ha enviado un correo de confirmación a tu correo electronico";
+                ViewBag.Message = "Se ha enviado un correo de confirmación a tu correo electronico";
                 return View("Modal");
             }
             else
             {
                 ViewBag.Modal = "show";
-                ViewBag.Mensaje = "El correo ingresado no esta registrado";
+                ViewBag.Message = "El correo ingresado no esta registrado";
                 return View("Modal");
             }
         }
@@ -110,7 +110,7 @@ namespace PL.Controllers
             usuario.Password = passwordHash; //asignar contraseña encriptada y agregar usuario
             usuario.Email = email;
             ML.Result result = BL.Usuario.UpdatePassword(usuario);
-            ViewBag.Mensaje = "Se actualizo la contraseña";
+            ViewBag.Message = "Se actualizo la contraseña";
             return View("Modal");
         }
     }
