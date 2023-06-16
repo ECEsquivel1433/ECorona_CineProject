@@ -48,7 +48,7 @@ namespace PL.Controllers
                     {
                         return RedirectToAction("Popular", "Pelicula");
                     }
-
+                    
                 }
                 else
                 {
